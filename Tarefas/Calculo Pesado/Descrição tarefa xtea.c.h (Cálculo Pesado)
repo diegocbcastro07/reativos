@@ -1,0 +1,3 @@
+Observação:
+Coloquei as duas funções:
+encipher e decipher dentro do mesmo código, por isso não importei a xtea.c.h
