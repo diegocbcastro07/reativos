@@ -1,0 +1,33 @@
+#include "arduino/arduino.ceu"
+
+input  int PIN_02;
+output int PIN_13;
+
+loop do
+    par/or do
+        loop do
+            emit PIN_13(HIGH);
+            await 1s;
+            emit PIN_13(LOW);
+            await 1s;
+        end
+    with
+        var int on = await PIN_02 until on==LOW;
+    await 50ms;
+    end
+
+    emit PIN_13(HIGH);
+
+    loop do
+    
+        var int on = await PIN_02 until on==LOW;
+    await 50ms;
+    par/or do
+        var int on = await PIN_02 until on==HIGH;
+        await 50ms;
+    with
+        await 5s;
+        break;
+    end
+    end
+end
