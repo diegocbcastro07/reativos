@@ -1,0 +1,3 @@
+Trabalho 2 feito em ceu.
+Piscar 3 leds em tempos diferentes. 
+Caso ocorra um duplo click no intervalo de 500 ms, os leds devem parar.
