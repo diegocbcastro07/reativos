@@ -1,1 +1,0 @@
-Biblioteca padrão do gameduino
