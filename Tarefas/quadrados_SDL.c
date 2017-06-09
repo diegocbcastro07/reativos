@@ -9,7 +9,8 @@ SDL_Rect r = {100,100, tamQuadrado, tamQuadrado};
 SDL_Rect r2 = {150,250, tamQuadrado, tamQuadrado};
 float speed = 0.5;
 float speed2 = 0.3;
-int dir= 0;
+int dir = 0;
+int dir2 = 0;
 int dt = 0;
 
 void desenho(SDL_Renderer* renderer, SDL_Rect* r1, SDL_Rect* r2){
@@ -46,31 +47,64 @@ void andaQuadrado(){
 	{
 		case 0:
 			r.x += speed * dt;
-			r2.x += speed2 * dt;
-			if(r.x > 330 || r2.x > 330) {
+			if(r.x > 330) {
+				r.x = 330;
 				dir = 1;
 			}
 			break;
 
 		case 1:
 			r.y += speed * dt;
-			r2.y += speed2 * dt;
-			if(r.y > 370 || r2.y > 370) {
+			if(r.y > 370) {
+				r.y = 370;
 				dir = 2;
 			}
 			break;
 		case 2:
 			r.x -= speed * dt;
-			r2.x -= speed2 * dt;
-			if(r.x < 20 || r2.x < 20) {
+			if(r.x < 20) {
+				r.x = 20;
 				dir = 3;
 			}
 			break;
 		case 3:
 			r.y -= speed * dt;
-			r2.y -= speed2 * dt;
-			if(r.y < 180 || r2.y < 180) {
+			if(r.y < 180) {
+				r.y = 180;
 				dir = 0;
+			}
+			break;
+	}
+
+	switch (dir2)
+	{
+		case 0:
+			r2.x += speed2 * dt;
+			if(r2.x > 330) {
+				r2.x = 330;
+				dir2 = 1;
+			}
+			break;
+
+		case 1:
+			r2.y += speed2 * dt;
+			if(r2.y > 370) {
+				r2.y = 370;
+				dir2 = 2;
+			}
+			break;
+		case 2:
+			r2.x -= speed2 * dt;
+			if(r2.x < 20) {
+				r2.x = 20;
+				dir2 = 3;
+			}
+			break;
+		case 3:
+			r2.y -= speed2 * dt;
+			if(r2.y < 180) {
+				r2.y = 180;
+				dir2 = 0;
 			}
 			break;
 	}
