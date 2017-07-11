@@ -1,0 +1,207 @@
+#include <SPI.h>
+#include <GD2.h>
+
+#define CIMA 1
+#define DIREITA 2
+#define BAIXO 3
+#define ESQUERDA 4
+#define VELOCIDADE 1
+#define DISTANCIA_ENTRE_PONTOS 3
+#define TAMANHO_HORIZONTAL 479
+#define TAMANHO_VERTICAL 271
+int inicio = 0;
+int fim = 0;
+int tem_bolinha = 0;
+int pontuacao = 0;
+char caracter;
+
+struct ponto {
+      int x;
+      int y; 
+}; 
+
+struct snake {
+  struct ponto pontos[100];
+  int tamanho;
+  int direcao;
+};
+
+struct ponto primeiro_ponto = {240, 136};
+struct ponto bolinha = {0,0};
+struct ponto segundo_ponto = {235, 136};
+struct ponto terceiro = {235, 136};
+struct snake cobra;
+
+void draw_bolinha(){
+  if(tem_bolinha == 0){
+     tem_bolinha = 1;
+     bolinha.x = random(0, TAMANHO_HORIZONTAL-5);
+     bolinha.y = random(0, TAMANHO_VERTICAL-5);
+  }
+  GD.cmd_text(bolinha.x, bolinha.y, 31, OPT_CENTER, ".");
+};
+
+  struct snake movimenta(struct snake s){
+  struct snake cobra = s;
+  int i = s.tamanho;
+
+  //movimento pelo controle
+   if(Serial1.available())
+    { 
+          caracter = Serial1.read();
+          if(caracter == '0')
+          {
+                cobra.direcao == CIMA;
+                while(i>0){
+                    cobra.pontos[i].x = cobra.pontos[i-1].x;
+                    cobra.pontos[i].y = cobra.pontos[i-1].y + DISTANCIA_ENTRE_PONTOS;
+                    i--;
+                }
+                cobra.pontos[0].y += -VELOCIDADE;
+          }
+ 
+          if(caracter == '1')
+          {
+                cobra.direcao == DIREITA;
+                while(i>0){
+                    cobra.pontos[i].x = cobra.pontos[i-1].x - DISTANCIA_ENTRE_PONTOS;
+                    cobra.pontos[i].y = cobra.pontos[i-1].y;
+                    i--;
+                }
+                cobra.pontos[0].x += VELOCIDADE;
+          }
+          
+          if(caracter == '2')
+          {
+                cobra.direcao == BAIXO;
+                while(i>0){
+                    cobra.pontos[i].x = cobra.pontos[i-1].x;
+                    cobra.pontos[i].y = cobra.pontos[i-1].y -DISTANCIA_ENTRE_PONTOS;
+                    i--;
+                 }
+                 cobra.pontos[0].y += VELOCIDADE;
+          }
+          
+          if(caracter == '3')
+          {
+                cobra.direcao == ESQUERDA;
+                while(i>0){
+                    cobra.pontos[i].x = cobra.pontos[i-1].x + DISTANCIA_ENTRE_PONTOS;
+                    cobra.pontos[i].y = cobra.pontos[i-1].y;
+                    i--;
+                }
+                cobra.pontos[0].x += -VELOCIDADE;
+          }
+    }
+  
+  return cobra;
+};
+
+void draw(struct snake cobra){
+  int i = 0;
+  while(i < cobra.tamanho){
+     GD.cmd_text(cobra.pontos[i].x, cobra.pontos[i].y, 31, OPT_CENTER, ".");
+     i++;
+  }
+};
+
+
+void detecta_colisao(struct snake cobra){
+    if(cobra.pontos[0].x > TAMANHO_HORIZONTAL || cobra.pontos[0].x < 0 || cobra.pontos[0].y > TAMANHO_VERTICAL-10 || cobra.pontos[0].y < 0){
+      fim = 1;
+    }
+};
+
+void restart(){
+  cobra.tamanho = 3;
+  cobra.pontos[0] = primeiro_ponto;
+  cobra.pontos[1] = segundo_ponto;
+  cobra.pontos[2] = terceiro;
+  cobra.direcao = DIREITA;
+  pontuacao = 0;
+  tem_bolinha = 0;
+};
+
+void pontua(){
+   int i = 0;
+   if(cobra.pontos[i].x > (bolinha.x - 5) && cobra.pontos[i].x < (bolinha.x + 5) ){
+     if(cobra.pontos[i].y > (bolinha.y - 5) && cobra.pontos[i].y < (bolinha.y + 5) ){
+        tem_bolinha = 0;
+        cobra.tamanho++;
+        pontuacao++;
+     }
+   }
+};
+
+void draw_pontuacao(){
+    GD.cmd_number(30, 30, 21, OPT_CENTER, pontuacao);
+};
+
+
+void setup()
+{
+  GD.begin(0);
+  cobra.tamanho = 3;
+  cobra.pontos[0] = primeiro_ponto;
+  cobra.pontos[1] = segundo_ponto;
+  cobra.pontos[2] = terceiro;
+  cobra.direcao = DIREITA;
+
+  //setup do controle
+  Serial1.begin(9600);
+}
+
+void loop()
+{
+  GD.get_inputs();
+  GD.Clear();
+  //mensagem ao iniciar
+  if(fim == 0){
+    GD.cmd_text(240, 136, 31, OPT_CENTER, "Tap to Start");
+  }
+  //mensagem ao acabar
+  else if(fim == 1){
+    GD.cmd_text(240, 106, 31, OPT_CENTER, "GAME OVER");
+    GD.cmd_text(240, 136, 24, OPT_CENTER, "Tap to Restart");
+    GD.cmd_text(240, 166, 21, OPT_CENTER, "score: ");
+    GD.cmd_number(265, 166, 21, OPT_CENTER, pontuacao);
+  }
+
+   if(Serial1.available())
+    { 
+          caracter = Serial1.read();
+          if(caracter == 's')
+          {
+              inicio = 1;
+              fim = 0;
+              restart();
+          }
+  }
+  
+  if(inicio == 1){
+    
+    //iniciou o jogo
+    while(fim == 0){
+      //GD.get_inputs();
+      GD.Clear();
+      
+      draw_bolinha();
+      
+      //detecta colisao
+      detecta_colisao(cobra);
+
+      //Pontua detecta se passou pela bolinha
+      pontua();
+      
+      //faz o deslocamento da cobra
+      cobra = movimenta(cobra);
+    
+      //desenha a cobra
+      draw(cobra);
+      draw_pontuacao();
+      GD.swap();
+    }
+     
+  }
+  GD.swap();  
+}
