@@ -8,7 +8,7 @@ Alunos:
   
 Descrição:
 
-    Jogo snake multiplayer feito em arduino(gameduino) e controlado por android.
+    Jogo snake feito em arduino(gameduino) e controlado por android.
   
 Peças necessárias:
 
