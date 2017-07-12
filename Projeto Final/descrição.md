@@ -12,7 +12,7 @@ Descrição:
   
 Peças necessárias:
 
-    (1) Arduino uno ou atmega2560
+    (1) Arduino atmega2560
   
     (2) Tela LCD gameduino
   
